@@ -7,6 +7,9 @@ export class FrappePrismaService extends PrismaClient {
    *
    */
   constructor() {
-    super();
+    super({
+      datasourceUrl:
+        'mysql://root:6Gjfb2oKPK0OMwNO@127.0.0.1:3306/_d8e7a160b7badfc3',
+    });
   }
 }
