@@ -49,6 +49,8 @@ export class FrappeLogicService {
   > {
     try {
       return await this.db.tabLMS_Course.findMany();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
