@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/signUpDb"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StudentApplication {
+  id               String         @id @default(uuid())
+  fullName         String
+  email            String         @unique
+  phoneNumber      String
+  dateOfBirth      DateTime
+  gender           Gender
+  stateOfOrigin    String
+  currentResidence String?
+  educationLevel   EducationLevel
+  areaOfStudy      AreaOfStudy
+  preferredTrack   PreferredTrack
+
+  englishReading  Int
+  englishWriting  Int
+  englishSpeaking Int
+
+  basicITSkills String[]
+  typingSpeed   Int
+
+  zoomConfidence  Int
+  slackConfidence Int
+  emailConfidence Int
+  docsConfidence  Int
+
+  problemSolvingAnswers String[]
+
+  needsLoan         Boolean
+  employmentStatus  EmploymentStatus
+  willingToRelocate Boolean
+  hasLaptop         Boolean
+
+  availability    Availability
+  motivationEssay String
+  futureGoals     String
+  willingToCommit Boolean
+  nyscStatus      NYSCStatus
+  wantsMentor     Boolean
+
+  cybersecurityAnswers String[]
+
+  applicationFeeStatus ApplicationFeeStatus        @default(UNPAID)
+  payments             StudentApplicationPayment[]
+  frappeId             String?                     @unique
+  odooId               Int?                        @unique
+  socialRegisterId     String?                     @unique
+
+  createdAt DateTime @default(now())
+}
+
+model StudentApplicationPayment {
+  id               String             @id @default(uuid())
+  application      StudentApplication @relation(fields: [applicationId], references: [id])
+  applicationId    String
+  amount           Float
+  currency         String             @default("USD")
+  status           PaymentStatus      @default(PENDING)
+  method           PaymentMethod
+  reference        String? // Payment gateway ref (e.g. Paystack)
+  socialRegister   SocialRegister?    @relation(fields: [socialRegisterId], references: [id])
+  socialRegisterId String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model SocialRegister {
+  id         String  @id @default(uuid())
+  fullName   String
+  nationalId String  @unique
+  lga        String
+  state      String
+  gender     Gender
+  age        Int
+  email      String?
+  phone      String?
+
+  applicationPayments StudentApplicationPayment[]
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum EducationLevel {
+  none
+  primary
+  secondary
+  tertiary
+  postgraduate
+}
+
+enum AreaOfStudy {
+  science
+  arts
+  social_science
+  engineering
+  medical
+  other
+}
+
+enum PreferredTrack {
+  software
+  data
+  design
+  product
+  cybersecurity_ai
+}
+
+enum EmploymentStatus {
+  employed
+  unemployed
+  student
+}
+
+enum Availability {
+  morning
+  afternoon
+  evening
+  weekend
+}
+
+enum NYSCStatus {
+  completed
+  currently_serving
+  exempted
+  not_applicable
+}
+
+enum ApplicationFeeStatus {
+  PAID
+  WAIVED
+  UNPAID
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+  WAIVED
+}
+
+enum PaymentMethod {
+  CARD
+  TRANSFER
+  USSD
+  MANUAL
+  WAIVER
+}

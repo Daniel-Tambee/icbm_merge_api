@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/socialRegister"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id                  String               @id @default(uuid())
+  fullName            String
+  email               String               @unique
+  phone               String?
+  studentId           String               @unique
+  registeredAt        DateTime             @default(now())
+  socialRegisterEntry SocialRegisterEntry?
+  applications        ProgramApplication[]
+}
+
+model SocialRegisterEntry {
+  id         String          @id @default(uuid())
+  student    Student         @relation(fields: [studentId], references: [id])
+  studentId  String          @unique
+  provider   SubsidyProvider @relation(fields: [providerId], references: [id])
+  providerId String
+  dateAdded  DateTime        @default(now())
+}
+
+model Program {
+  id           String               @id @default(uuid())
+  name         String
+  description  String?
+  feeUSD       Float                @default(3.0)
+  createdAt    DateTime             @default(now())
+  applications ProgramApplication[]
+}
+
+model ProgramApplication {
+  id        String   @id @default(uuid())
+  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String
+  program   Program  @relation(fields: [programId], references: [id])
+  programId String
+  feeWaived Boolean  @default(false)
+  appliedAt DateTime @default(now())
+}
+
+model SubsidyProvider {
+  id      String       @id @default(uuid())
+  name    String
+  type    ProviderType
+  addedAt DateTime     @default(now())
+
+  entries SocialRegisterEntry[]
+}
+
+enum ProviderType {
+  GOVERNMENT
+  NGO
+}
